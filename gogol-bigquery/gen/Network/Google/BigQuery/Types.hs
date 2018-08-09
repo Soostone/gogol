@@ -32,6 +32,7 @@ module Network.Google.BigQuery.Types
     , JobReference
     , jobReference
     , jrJobId
+    , jrLocation
     , jrProjectId
 
     -- * TableList
@@ -46,6 +47,7 @@ module Network.Google.BigQuery.Types
     -- * DataSetListDataSetsItem
     , DataSetListDataSetsItem
     , dataSetListDataSetsItem
+    , dsldsiLocation
     , dsldsiFriendlyName
     , dsldsiKind
     , dsldsiDataSetReference
@@ -69,16 +71,22 @@ module Network.Google.BigQuery.Types
     , jctcSourceTables
     , jctcCreateDisPosition
     , jctcSourceTable
+    , jctcDestinationEncryptionConfiguration
 
     -- * TableListTablesItem
     , TableListTablesItem
     , tableListTablesItem
+    , tltiCreationTime
+    , tltiClustering
     , tltiTableReference
     , tltiFriendlyName
     , tltiKind
+    , tltiTimePartitioning
+    , tltiView
     , tltiId
     , tltiLabels
     , tltiType
+    , tltiExpirationTime
 
     -- * TableSchema
     , TableSchema
@@ -99,6 +107,15 @@ module Network.Google.BigQuery.Types
     , explainQueryStep
     , eqsSubsteps
     , eqsKind
+
+    -- * QueryTimelineSample
+    , QueryTimelineSample
+    , queryTimelineSample
+    , qtsPendingUnits
+    , qtsTotalSlotMs
+    , qtsActiveUnits
+    , qtsElapsedMs
+    , qtsCompletedUnits
 
     -- * QueryParameterTypeStructTypesItem
     , QueryParameterTypeStructTypesItem
@@ -121,8 +138,10 @@ module Network.Google.BigQuery.Types
     , jobStatistics
     , jsCreationTime
     , jsStartTime
+    , jsCompletionRatio
     , jsLoad
     , jsTotalBytesProcessed
+    , jsQuotaDeferments
     , jsEndTime
     , jsQuery
     , jsExtract
@@ -136,6 +155,7 @@ module Network.Google.BigQuery.Types
     , DataSet
     , dataSet
     , dsCreationTime
+    , dsDefaultPartitionExpirationMs
     , dsAccess
     , dsEtag
     , dsLocation
@@ -155,6 +175,11 @@ module Network.Google.BigQuery.Types
     , boReadRowkeyAsString
     , boIgnoreUnspecifiedColumnFamilies
     , boColumnFamilies
+
+    -- * Clustering
+    , Clustering
+    , clustering
+    , cFields
 
     -- * ExternalDataConfiguration
     , ExternalDataConfiguration
@@ -176,6 +201,13 @@ module Network.Google.BigQuery.Types
     , trDataSetId
     , trProjectId
     , trTableId
+
+    -- * ModelDefinitionModelOptions
+    , ModelDefinitionModelOptions
+    , modelDefinitionModelOptions
+    , mdmoModelType
+    , mdmoLabels
+    , mdmoLossType
 
     -- * TableFieldSchema
     , TableFieldSchema
@@ -213,6 +245,7 @@ module Network.Google.BigQuery.Types
     -- * QueryRequest
     , QueryRequest
     , queryRequest
+    , qrLocation
     , qrUseQueryCache
     , qrPreserveNulls
     , qrKind
@@ -235,6 +268,15 @@ module Network.Google.BigQuery.Types
     , qpParameterType
     , qpName
 
+    -- * IterationResult
+    , IterationResult
+    , iterationResult
+    , irDurationMs
+    , irLearnRate
+    , irEvalLoss
+    , irTrainingLoss
+    , irIndex
+
     -- * JobStatistics4
     , JobStatistics4
     , jobStatistics4
@@ -248,20 +290,54 @@ module Network.Google.BigQuery.Types
     -- * ExplainQueryStage
     , ExplainQueryStage
     , explainQueryStage
+    , eqsReadMsAvg
     , eqsStatus
+    , eqsShuffleOutputBytesSpilled
+    , eqsReadMsMax
+    , eqsCompletedParallelInputs
     , eqsWaitRatioMax
+    , eqsParallelInputs
+    , eqsShuffleOutputBytes
     , eqsRecordsWritten
     , eqsSteps
+    , eqsInputStages
     , eqsWriteRatioAvg
     , eqsRecordsRead
     , eqsComputeRatioAvg
     , eqsName
+    , eqsComputeMsMax
     , eqsReadRatioMax
+    , eqsWriteMsMax
     , eqsWaitRatioAvg
+    , eqsWaitMsAvg
     , eqsId
     , eqsComputeRatioMax
     , eqsWriteRatioMax
+    , eqsComputeMsAvg
     , eqsReadRatioAvg
+    , eqsWriteMsAvg
+    , eqsStartMs
+    , eqsEndMs
+    , eqsWaitMsMax
+
+    -- * TrainingRunTrainingOptions
+    , TrainingRunTrainingOptions
+    , trainingRunTrainingOptions
+    , trtoLineSearchInitLearnRate
+    , trtoMinRelProgress
+    , trtoL1Reg
+    , trtoLearnRate
+    , trtoLearnRateStrategy
+    , trtoMaxIteration
+    , trtoEarlyStop
+    , trtoL2Reg
+    , trtoWarmStart
+
+    -- * BigQueryModelTraining
+    , BigQueryModelTraining
+    , bigQueryModelTraining
+    , bqmtExpectedTotalIterations
+    , bqmtCurrentIteration
 
     -- * JobConfigurationLoad
     , JobConfigurationLoad
@@ -271,6 +347,7 @@ module Network.Google.BigQuery.Types
     , jclDestinationTable
     , jclWriteDisPosition
     , jclAllowJaggedRows
+    , jclClustering
     , jclSchemaInline
     , jclIgnoreUnknownValues
     , jclSchemaUpdateOptions
@@ -279,11 +356,14 @@ module Network.Google.BigQuery.Types
     , jclAllowQuotedNewlines
     , jclSourceFormat
     , jclSchema
+    , jclTimePartitioning
     , jclQuote
     , jclMaxBadRecords
     , jclAutodetect
     , jclSourceURIs
     , jclEncoding
+    , jclDestinationTableProperties
+    , jclDestinationEncryptionConfiguration
     , jclFieldDelimiter
     , jclNullMarker
 
@@ -304,6 +384,12 @@ module Network.Google.BigQuery.Types
     , tdiarRows
     , tdiarTemplateSuffix
     , tdiarSkipInvalidRows
+
+    -- * GetServiceAccountResponse
+    , GetServiceAccountResponse
+    , getServiceAccountResponse
+    , gsarEmail
+    , gsarKind
 
     -- * ProjectListProjectsItem
     , ProjectListProjectsItem
@@ -352,7 +438,9 @@ module Network.Google.BigQuery.Types
     -- * TimePartitioning
     , TimePartitioning
     , timePartitioning
+    , tpField
     , tpExpirationMs
+    , tpRequirePartitionFilter
     , tpType
 
     -- * QueryParameterValueStructValues
@@ -371,6 +459,7 @@ module Network.Google.BigQuery.Types
     , jcCopy
     , jcLoad
     , jcQuery
+    , jcJobTimeoutMs
     , jcExtract
     , jcLabels
     , jcDryRun
@@ -387,6 +476,11 @@ module Network.Google.BigQuery.Types
     , jId
     , jStatistics
     , jConfiguration
+
+    -- * EncryptionConfiguration
+    , EncryptionConfiguration
+    , encryptionConfiguration
+    , ecKmsKeyName
 
     -- * TableDataInsertAllResponseInsertErrorsItem
     , TableDataInsertAllResponseInsertErrorsItem
@@ -405,6 +499,12 @@ module Network.Google.BigQuery.Types
     , jceDestinationURI
     , jceFieldDelimiter
 
+    -- * ModelDefinition
+    , ModelDefinition
+    , modelDefinition
+    , mdModelOptions
+    , mdTrainingRuns
+
     -- * JobCancelResponse
     , JobCancelResponse
     , jobCancelResponse
@@ -422,6 +522,7 @@ module Network.Google.BigQuery.Types
     , jcqDestinationTable
     , jcqWriteDisPosition
     , jcqPriority
+    , jcqClustering
     , jcqUseQueryCache
     , jcqPreserveNulls
     , jcqTableDefinitions
@@ -432,16 +533,19 @@ module Network.Google.BigQuery.Types
     , jcqUserDefinedFunctionResources
     , jcqAllowLargeResults
     , jcqMaximumBillingTier
+    , jcqTimePartitioning
     , jcqQuery
     , jcqFlattenResults
     , jcqParameterMode
     , jcqUseLegacySQL
+    , jcqDestinationEncryptionConfiguration
     , jcqDefaultDataSet
 
     -- * GoogleSheetsOptions
     , GoogleSheetsOptions
     , googleSheetsOptions
     , gsoSkipLeadingRows
+    , gsoRange
 
     -- * TableDataInsertAllRequestRowsItem
     , TableDataInsertAllRequestRowsItem
@@ -467,6 +571,12 @@ module Network.Google.BigQuery.Types
     , tableCell
     , tcV
 
+    -- * JobStatistics2ReservationUsageItem
+    , JobStatistics2ReservationUsageItem
+    , jobStatistics2ReservationUsageItem
+    , jsruiName
+    , jsruiSlotMs
+
     -- * QueryParameterValue
     , QueryParameterValue
     , queryParameterValue
@@ -490,16 +600,26 @@ module Network.Google.BigQuery.Types
     -- * JobStatistics2
     , JobStatistics2
     , jobStatistics2
+    , jModelTrainingExpectedTotalIteration
+    , jModelTraining
+    , jTotalSlotMs
+    , jDdlTargetTable
+    , jEstimatedBytesProcessed
+    , jModelTrainingCurrentIteration
     , jSchema
     , jTotalBytesProcessed
     , jBillingTier
     , jUndeclaredQueryParameters
     , jReferencedTables
     , jStatementType
+    , jReservationUsage
     , jNumDmlAffectedRows
+    , jTimeline
     , jQueryPlan
     , jCacheHit
     , jTotalBytesBilled
+    , jDdlOperationPerformed
+    , jTotalPartitionsProcessed
 
     -- * JobStatus
     , JobStatus
@@ -512,6 +632,12 @@ module Network.Google.BigQuery.Types
     , TableLabels
     , tableLabels
     , tlAddtional
+
+    -- * DestinationTableProperties
+    , DestinationTableProperties
+    , destinationTableProperties
+    , dtpFriendlyName
+    , dtpDescription
 
     -- * DataSetAccessItem
     , DataSetAccessItem
@@ -542,6 +668,7 @@ module Network.Google.BigQuery.Types
     , tabCreationTime
     , tabEtag
     , tabNumBytes
+    , tabClustering
     , tabExternalDataConfiguration
     , tabLocation
     , tabTableReference
@@ -551,6 +678,8 @@ module Network.Google.BigQuery.Types
     , tabSchema
     , tabStreamingBuffer
     , tabSelfLink
+    , tabEncryptionConfiguration
+    , tabModel
     , tabTimePartitioning
     , tabNumRows
     , tabView
@@ -586,6 +715,7 @@ module Network.Google.BigQuery.Types
     , jsOutputRows
     , jsOutputBytes
     , jsInputFileBytes
+    , jsBadRecords
 
     -- * QueryResponse
     , QueryResponse
@@ -606,6 +736,19 @@ module Network.Google.BigQuery.Types
     , DataSetListDataSetsItemLabels
     , dataSetListDataSetsItemLabels
     , dsldsilAddtional
+
+    -- * TrainingRun
+    , TrainingRun
+    , trainingRun
+    , trState
+    , trStartTime
+    , trIterationResults
+    , trTrainingOptions
+
+    -- * TableListTablesItemView
+    , TableListTablesItemView
+    , tableListTablesItemView
+    , tltivUseLegacySQL
 
     -- * TableListTablesItemLabels
     , TableListTablesItemLabels
